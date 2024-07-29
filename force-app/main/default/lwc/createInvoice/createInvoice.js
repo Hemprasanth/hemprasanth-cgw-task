@@ -32,25 +32,25 @@ export default class CreateInvoice extends LightningElement {
     // Approach 1 : Using pageReference object (but needs keys to be prepended with c__ / namespace__)
 
 
-    // Approach 2 : Using plain javascript (to overcome namespace__)
-    connectedCallback(){
-        this.setRowDataBasedOnParams();
-    }
+    // // Approach 2 : Using plain javascript (to overcome namespace__)
+    // connectedCallback(){
+    //     this.setRowDataBasedOnParams();
+    // }
 
-    setRowDataBasedOnParams(){
-        const queryString = window.location.search;
-        const urlParams = new URLSearchParams(queryString);
-        let idNum = 0;
-        for(let [key, value] of urlParams.entries()){
-            this.rowData.push(
-                {
-                    id : idNum++,
-                    urlParam: key,
-                    urlParamValue: value
-                }
-            )
-        }
-    }
-    // Approach 2 : Using plain javascript
+    // setRowDataBasedOnParams(){
+    //     const queryString = window.location.search;
+    //     const urlParams = new URLSearchParams(queryString);
+    //     let idNum = 0;
+    //     for(let [key, value] of urlParams.entries()){
+    //         this.rowData.push(
+    //             {
+    //                 id : idNum++,
+    //                 urlParam: key,
+    //                 urlParamValue: value
+    //             }
+    //         )
+    //     }
+    // }
+    // // Approach 2 : Using plain javascript
 
 }
