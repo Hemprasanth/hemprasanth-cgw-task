@@ -1,0 +1,57 @@
+Create Invoice
+
+Functional
+    Invoice - Billing
+    Create Invoice for any item along with line Items. 
+
+Req
+    Screen to dynamically create Invoice record based on 
+        URL params
+        Dynamic fields passed on URL
+        Button from Record page
+
+Invoice
+    Links to Account and any SF object
+    Invoice - child Line Items (cant exist w/o Invoice - MD or Lookup reqd)
+
+Tech Design
+    Data Model
+        Invoice
+        invoice Line Items
+        Link b/w both
+        fields
+
+    LWC
+        Button on record page - Quick Action/ or new cmp navigation
+            On click - New page
+            Accept URL params on Page load/ cmp instatntiate
+
+        Component
+            Read from URL
+            Table to show URL parse
+
+        Connection - On click navigate to plain URL or via cmp
+
+    Apex
+
+
+Phase 1
+    Data Model
+    Button
+    Parse data from URL
+
+Phase 2
+    Query Data
+    Convert to JSON
+
+Phase 3
+    Create Invoices and Line Items in SF
+
+
+
+Assumptions/Notes
+
+Account-Invoice : Lookup Reqd (didnt feel M-D need)
+Defaults for field settings where no specific req
+Invoice Reference : Text - recordId. Can hyave formula field for record link based on recordId
+Line Description : Text
