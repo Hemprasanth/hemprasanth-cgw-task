@@ -1,7 +1,25 @@
+<!--
+  @description       : 
+  @author            : Hemprasanth Karunakaran
+  @group             : 
+  @last modified on  : 07-30-2024
+  @last modified by  : Hemprasanth Karunakaran
+-->
 <template>
-    <lightning-card title="Create Invoice (configs)">
-        <lightning-datatable key-field="Id"
-        data={rowData} columns={columns}
-        hide-checkbox-column></lightning-datatable>
+    
+    <lightning-card title="Create Invoice (field configs/ JSON data)" class="slds-var-p-around_medium">
+        <template lwc:if={showTablePage}>
+            <lightning-datatable key-field="Id" 
+            data={rowData} columns={columns}
+            hide-checkbox-column></lightning-datatable>
+            <div slot="footer" class="slds-clearfix"> 
+                <lightning-button label="Show JSON" onclick={showJSONdata}  class="slds-var-m-left_x-small slds-float_right"></lightning-button>
+            </div>
+        </template>
+
+        <template lwc:if={showJSONPage}>
+            <pre>{invoiceJsonString}</pre>
+        </template>
+
     </lightning-card>
 </template>

@@ -1,5 +1,7 @@
 import { LightningElement, wire } from 'lwc';
 import { CurrentPageReference } from 'lightning/navigation';
+import generateInvoice from '@salesforce/apex/InvoiceController.generateInvoice';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class CreateInvoice extends LightningElement {
 
@@ -11,26 +13,66 @@ export default class CreateInvoice extends LightningElement {
         { label: 'Value', fieldName: 'urlParamValue', type: 'text' }
     ];
 
+    paramValuesMap = {};
+    paramValuesMapRaw = {};
+
+    invoiceJsonString = '';
+    
     // Approach 1 : Using pageReference object (but needs keys to be prepended with c__ / namespace__)
     @wire(CurrentPageReference)
     setRowDataBasedOnPageRef(currentPageReference) {
         this.currentPageRef = currentPageReference;
-        if(this.currentPageRef?.state){
+        if (this.currentPageRef?.state) {
             // Arbitrary counter for row's unique Id 
             let idNum = 0;
-            for(let [key, value] of Object.entries(this.currentPageRef.state)){
+            this.paramValuesMapRaw = Object.entries(this.currentPageRef.state);
+            for (let [key, value] of this.paramValuesMapRaw) {
                 this.rowData.push(
                     {
-                        id : idNum++,
+                        id: idNum++,
                         urlParam: key,
                         urlParamValue: value
                     }
                 )
+
+                // removing c__. Can be modified to accomodate any namespace if needed
+                this.paramValuesMap[key.substring(3)] = value;
             }
         }
     }
     // Approach 1 : Using pageReference object (but needs keys to be prepended with c__ / namespace__)
 
+    showJSONdata() {
+        generateInvoice({
+            urlParamValuesMap : this.paramValuesMap
+        }).then(result => {
+            this.showToast("Success", "Generated Invoice JSON", "Success");
+            this.invoiceJsonString = result;
+        }
+        ).catch(err => {
+            this.showToast("Error", err, "Error");
+        }).finally(() => {
+
+        })
+    }
+
+
+
+    showToast(title, message, variant) {
+        this.dispatchEvent(new ShowToastEvent({
+            title: title,
+            message: message,
+            variant: variant
+        }));
+    }
+
+    get showTablePage(){
+        return !this.invoiceJsonString;
+    }
+
+    get showJSONPage(){
+        return !!this.invoiceJsonString;
+    }
 
     // // Approach 2 : Using plain javascript (to overcome namespace__)
     // connectedCallback(){
