@@ -137,10 +137,11 @@ public with sharing class InvoiceController {
         
         Invoice__c invoice = new Invoice__c();
         invoice.Account__c = (Id) record.get(account);
-        invoice.Due_Date__c = ((DateTime) record.get(invoiceDueDate)).date();
-        invoice.Invoice_Date__c = ((DateTime) record.get(invoiceDate)).date();
-        // invoice.Due_Date__c = (Date) record.get(invoiceDueDate);
-        // invoice.Invoice_Date__c = (Date) record.get(invoiceDate);
+        invoice.Due_Date__c = (Date) record.get(invoiceDueDate);
+        invoice.Invoice_Date__c = (Date) record.get(invoiceDate);
+        // Test Data - was using DateTime field. Ignore please
+        // invoice.Due_Date__c = ((DateTime) record.get(invoiceDueDate)).date();
+        // invoice.Invoice_Date__c = ((DateTime) record.get(invoiceDate)).date();
         insert invoice;
 
         List<Invoice_Line_Item__c> invoiceLineItems = new List<Invoice_Line_Item__c>();

@@ -63,7 +63,7 @@ export default class CreateInvoice extends NavigationMixin(LightningElement) {
             urlParamValuesMap: this.paramValuesMap,
             doInsert: true
         }).then(result => {
-            this.showToast("Success", "Generated Invoice in Salesforce. Redirecting...", "Success");
+            this.showToast("Success", "Generated Invoice in Salesforce.", "Success");
             console.log(result);
             this.navigateToRecordViewPage(result);
         }
