@@ -2,13 +2,20 @@
  * @description       : 
  * @author            : Hemprasanth Karunakaran
  * @group             : 
- * @last modified on  : 07-30-2024
+ * @last modified on  : 07-31-2024
  * @last modified by  : Hemprasanth Karunakaran
 **/
 public with sharing class InvoiceController {
     
+    /**
+    * @description Used to generate Invoice.
+    * @author Hemprasanth Karunakaran | 07-31-2024 
+    * @param urlParamValuesMap 
+    * @param doInsert - if true, Invoice and Line Items will be created in SF besides JSON generation. if false, only JSON generation happens
+    * @return String - returns JSON string or newly created Invoice Id.
+    **/
     @AuraEnabled
-    public static String generateInvoice(Map<String, String> urlParamValuesMap){
+    public static String generateInvoice(Map<String, String> urlParamValuesMap, Boolean doInsert){
         String response = '';
         try {
             // Passing each param. Can pass a map as well if we have more params, and loop over to get field api names
@@ -57,6 +64,19 @@ public with sharing class InvoiceController {
             );
 
             response = jsonData;
+
+            if(doInsert){
+                response = createInvoice(
+                    record, 
+                    account,
+                    invoice_date, 
+                    invoice_due_date, 
+                    child_relationship_name, 
+                    line_item_description, 
+                    line_item_quantity, 
+                    line_item_unit_price
+                );
+            }
 
         } catch (Exception e) {
             // Note : Can log exception before throwing to client
@@ -110,6 +130,35 @@ public with sharing class InvoiceController {
         gen.writeEndObject(); // End of Invoice JSON Object
         
         return gen.getAsString();
+    }
+
+    public static String createInvoice(SObject record, String account, String invoiceDate, String invoiceDueDate, String childRelationshipName, String lineItemDescription, String lineItemQuantity, String lineItemUnitPrice){
+        // Using plain DML statements. Can use Database.insert for better processing (partial inserts/ handling saveresults).
+        
+        Invoice__c invoice = new Invoice__c();
+        invoice.Account__c = (Id) record.get(account);
+        invoice.Due_Date__c = ((DateTime) record.get(invoiceDueDate)).date();
+        invoice.Invoice_Date__c = ((DateTime) record.get(invoiceDate)).date();
+        // invoice.Due_Date__c = (Date) record.get(invoiceDueDate);
+        // invoice.Invoice_Date__c = (Date) record.get(invoiceDate);
+        insert invoice;
+
+        List<Invoice_Line_Item__c> invoiceLineItems = new List<Invoice_Line_Item__c>();
+        for(SObject lineItem : record.getSObjects(childRelationshipName)){
+
+            Invoice_Line_Item__c invoiceLineItem = new Invoice_Line_Item__c();
+            invoiceLineItem.Invoice__c = invoice.Id;
+            invoiceLineItem.Line_Description__c = (String) lineItem.get(lineItemDescription);
+            invoiceLineItem.Quantity__c = (Double) lineItem.get(lineItemQuantity);
+            invoiceLineItem.Unit_Price__c = (Double) lineItem.get(lineItemUnitPrice);
+            // Dummy
+            invoiceLineItem.Name = 'Test' + invoiceLineItem.Line_Description__c;
+
+            invoiceLineItems.add(invoiceLineItem);
+        }
+        insert invoiceLineItems;
+
+        return String.valueOf(invoice.Id);
     }
     
 }

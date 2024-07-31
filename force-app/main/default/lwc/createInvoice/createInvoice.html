@@ -2,7 +2,7 @@
   @description       : 
   @author            : Hemprasanth Karunakaran
   @group             : 
-  @last modified on  : 07-30-2024
+  @last modified on  : 07-31-2024
   @last modified by  : Hemprasanth Karunakaran
 -->
 <template>
@@ -19,6 +19,9 @@
 
         <template lwc:if={showJSONPage}>
             <pre>{invoiceJsonString}</pre>
+            <div slot="footer" class="slds-clearfix"> 
+                <lightning-button label="Proceed to Create Invoice" onclick={createInvoice}  class="slds-var-m-left_x-small slds-float_right"></lightning-button>
+            </div>
         </template>
 
     </lightning-card>

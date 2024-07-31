@@ -2,8 +2,9 @@ import { LightningElement, wire } from 'lwc';
 import { CurrentPageReference } from 'lightning/navigation';
 import generateInvoice from '@salesforce/apex/InvoiceController.generateInvoice';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { NavigationMixin } from "lightning/navigation";
 
-export default class CreateInvoice extends LightningElement {
+export default class CreateInvoice extends NavigationMixin(LightningElement) {
 
     currentPageRef;
     rowData = [];
@@ -17,7 +18,7 @@ export default class CreateInvoice extends LightningElement {
     paramValuesMapRaw = {};
 
     invoiceJsonString = '';
-    
+
     // Approach 1 : Using pageReference object (but needs keys to be prepended with c__ / namespace__)
     @wire(CurrentPageReference)
     setRowDataBasedOnPageRef(currentPageReference) {
@@ -44,7 +45,8 @@ export default class CreateInvoice extends LightningElement {
 
     showJSONdata() {
         generateInvoice({
-            urlParamValuesMap : this.paramValuesMap
+            urlParamValuesMap: this.paramValuesMap,
+            doInsert: false
         }).then(result => {
             this.showToast("Success", "Generated Invoice JSON", "Success");
             this.invoiceJsonString = result;
@@ -56,6 +58,32 @@ export default class CreateInvoice extends LightningElement {
         })
     }
 
+    createInvoice() {
+        generateInvoice({
+            urlParamValuesMap: this.paramValuesMap,
+            doInsert: true
+        }).then(result => {
+            this.showToast("Success", "Generated Invoice in Salesforce. Redirecting...", "Success");
+            console.log(result);
+            this.navigateToRecordViewPage(result);
+        }
+        ).catch(err => {
+            this.showToast("Error", err, "Error");
+        }).finally(() => {
+
+        })
+    }
+
+    navigateToRecordViewPage(recordId) {
+        // View a Invoice record.
+        this[NavigationMixin.Navigate]({
+            type: "standard__recordPage",
+            attributes: {
+                recordId: recordId,
+                actionName: "view",
+            },
+        });
+    }
 
 
     showToast(title, message, variant) {
@@ -66,11 +94,11 @@ export default class CreateInvoice extends LightningElement {
         }));
     }
 
-    get showTablePage(){
+    get showTablePage() {
         return !this.invoiceJsonString;
     }
 
-    get showJSONPage(){
+    get showJSONPage() {
         return !!this.invoiceJsonString;
     }
 
